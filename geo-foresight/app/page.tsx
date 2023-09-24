@@ -5,15 +5,17 @@ import { useState } from "react";
 export default function Home() {
 
   let resultJSON
-  const [data, setData] = useState([]);
+  const [data, setData] = useState();
 
   function handleSearch() {
+
+    let resultado
 
     const fields = {
       ref_bacen: (document.querySelector('.ref_bacen').value == '') ? 'NULL' : document.querySelector('.ref_bacen').value,
       nu_ordem: (document.querySelector('.nu_ordem').value == '') ? 'NULL' : document.querySelector('.nu_ordem').value,
       coordenadas: (document.querySelector('.coordenadas').value == '') ? 'NULL' : document.querySelector('.coordenadas').value,
-      altitude: (document.querySelector('.ref_bacen').value == '') ? 'NULL' : document.querySelector('.ref_bacen').value,
+      altitude: (document.querySelector('.altitude').value == '') ? 'NULL' : document.querySelector('.altitude').value,
       inicio_plantio: (document.querySelector('.inicio_plantio').value == '') ? 'NULL' : document.querySelector('.inicio_plantio').value,
       final_plantio: (document.querySelector('.final_plantio').value == '') ? 'NULL' : document.querySelector('.final_plantio').value,
       inicio_colheita: (document.querySelector('.inicio_colheita').value == '') ? 'NULL' : document.querySelector('.inicio_colheita').value,
@@ -53,15 +55,22 @@ export default function Home() {
       redirect: 'follow'
     };
 
-    fetch("http://localhost:8080", requestOptions)
-      .then(response => setData(response))
+    fetch("http://127.0.0.1:5000/consulta_dinamica/", requestOptions)
+      .then(response => response.text())
+      .then(result => grava(result))
       .catch(error => console.log('error', error));
 
+
+  }
+
+  function grava(r: string) {
+    const jsonResult = JSON.parse(r)
+    setData(jsonResult)
   }
 
   return (
     <div className="flex">
-      <div className='bg-[#D9D9D9] m-7 w-max flex flex-col py-2 rounded-md items-center justify-between'>
+      <div className='bg-[#D9D9D9] m-7 w-64 h-[849px] border flex flex-col py-2 rounded-md items-center justify-between'>
         <div className="flex flex-col">
           <p className='mr-5 ml-5'>Código da Gleba</p>
           <input field-name="ref_bacen" className='ref_bacen rounded-md outline-none p-1 mr-5 mx-5' type="text" />
@@ -94,31 +103,49 @@ export default function Home() {
         </div>
         <button className='bg-[#376CB9] text-white h-15 mt-4 mb-2 w-36 rounded-md mr-5' onClick={handleSearch}>Localizar</button>
       </div>
-      <table className="my-7">
-        <tr className="bg-white h-2">
-          <th>ref_bacen</th>
-          <th>nu_ordem</th>
-          <th>coordenadas</th>
-          <th>altitude</th>
-          <th>inicio_plantio</th>
-          <th>final_plantio</th>
-          <th>inicio_colheita</th>
-          <th>final_colheita</th>
-          <th>descricao_grao</th>
-          <th>descricao_producao</th>
-          <th>descricao_irrigacao</th>
-          <th>data_liberacao</th>
-          <th>data_vencimento</th>
-          <th>descricao_ciclo</th>
-        </tr>
-        <tr className="h-2 bg-white">
-          <td>{data}</td>
-          <td>aaa</td>
-          <td>aaa</td>
-          <td>aaa</td>
-        </tr>
-        <tr></tr>
-      </table>
+      {data ?
+        <div className="my-7 max-h-[849px] mr-7 overflow-y-scroll w-red">
+          <table className="">
+            <tr className="bg-white h-2">
+              <th className="whitespace-nowrap border">ref_bacen</th>
+              <th className="whitespace-nowrap border">nu_ordem</th>
+              <th className="whitespace-nowrap border">coordenadas</th>
+              <th className="whitespace-nowrap border">altitude</th>
+              <th className="whitespace-nowrap border">inicio_plantio</th>
+              <th className="whitespace-nowrap border">final_plantio</th>
+              <th className="whitespace-nowrap border">inicio_colheita</th>
+              <th className="whitespace-nowrap border">final_colheita</th>
+              <th className="whitespace-nowrap border">descricao_grao</th>
+              <th className="whitespace-nowrap border">descricao_producao</th>
+              <th className="whitespace-nowrap border">descricao_irrigacao</th>
+              <th className="whitespace-nowrap border">data_liberacao</th>
+              <th className="whitespace-nowrap border">data_vencimento</th>
+              <th className="whitespace-nowrap border">descricao_ciclo</th>
+            </tr>
+            {data ? data.map(i => (
+              <tr className="h-2 bg-white" key={i.ref_bacen}>
+                <td className="whitespace-nowrap border">{i.ref_bacen}</td>
+                <td className="whitespace-nowrap border">{i.nu_ordem}</td>
+                <td className="whitespace-nowrap border">{i.coordenadas}</td>
+                <td className="whitespace-nowrap border">{i.altitude}</td>
+                <td className="whitespace-nowrap border">{i.inicio_plantio}</td>
+                <td className="whitespace-nowrap border">{i.final_plantio}</td>
+                <td className="whitespace-nowrap border">{i.inicio_colheita}</td>
+                <td className="whitespace-nowrap border">{i.final_colheita}</td>
+                <td className="whitespace-nowrap border">{i.descricao_grao}</td>
+                <td className="whitespace-nowrap border">{i.descricao_producao}</td>
+                <td className="whitespace-nowrap border">{i.descricao_irrigacao}</td>
+                <td className="whitespace-nowrap border">{i.data_liberacao}</td>
+                <td className="whitespace-nowrap border">{i.data_vencimento}</td>
+                <td className="whitespace-nowrap border">{i.descricao_ciclo}</td>
+
+              </tr>
+            )) : 'bbbbbb'}
+            <tr></tr>
+          </table>
+        </div>
+        : <></>}
+
     </div>
   );
 }
