@@ -44,7 +44,7 @@ export default function Home() {
       "descricao_irrigacao": fields.descricao_irrigacao,
       "data_liberacao": fields.data_liberacao,
       "data_vencimento": fields.data_vencimento,
-      "descricao_ciclo": '',
+      "descricao_ciclo": 'null',
     });
 
     var requestOptions = {
