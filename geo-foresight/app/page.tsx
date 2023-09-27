@@ -25,7 +25,6 @@ export default function Home() {
       descricao_irrigacao: (document.querySelector('.descricao_irrigacao').value == '') ? 'NULL' : document.querySelector('.descricao_irrigacao').value,
       data_liberacao: (document.querySelector('.data_liberacao').value == '') ? 'NULL' : document.querySelector('.data_liberacao').value,
       data_vencimento: (document.querySelector('.data_vencimento').value == '') ? 'NULL' : document.querySelector('.data_vencimento').value,
-      descricao_ciclo: (document.querySelector('.descricao_ciclo').value == '') ? 'NULL' : document.querySelector('.descricao_ciclo').value
     }
 
     var myHeaders = new Headers();
@@ -45,7 +44,7 @@ export default function Home() {
       "descricao_irrigacao": fields.descricao_irrigacao,
       "data_liberacao": fields.data_liberacao,
       "data_vencimento": fields.data_vencimento,
-      "descricao_ciclo": fields.descricao_ciclo,
+      "descricao_ciclo": '',
     });
 
     var requestOptions = {
@@ -98,8 +97,6 @@ export default function Home() {
           <input field-name="data_liberacao" className='data_liberacao rounded-md outline-none p-1 mx-5' type="text" />
           <p className='mr-5 ml-5'>Data Vencimento</p>
           <input field-name="data_vencimento" className='data_vencimento rounded-md outline-none p-1 mx-5' type="text" />
-          <p className='mr-5 ml-5'>Ciclo</p>
-          <input field-name="descricao_ciclo" className='descricao_ciclo rounded-md outline-none p-1 mx-5' type="text" />
         </div>
         <button className='bg-[#376CB9] text-white h-15 mt-4 mb-2 w-36 rounded-md mr-5' onClick={handleSearch}>Localizar</button>
       </div>
@@ -120,7 +117,6 @@ export default function Home() {
               <th className="whitespace-nowrap border">descricao_irrigacao</th>
               <th className="whitespace-nowrap border">data_liberacao</th>
               <th className="whitespace-nowrap border">data_vencimento</th>
-              <th className="whitespace-nowrap border">descricao_ciclo</th>
             </tr>
             {data ? data.map(i => (
               <tr className="h-2 bg-white" key={i.ref_bacen}>
@@ -137,10 +133,8 @@ export default function Home() {
                 <td className="whitespace-nowrap border">{i.descricao_irrigacao}</td>
                 <td className="whitespace-nowrap border">{i.data_liberacao}</td>
                 <td className="whitespace-nowrap border">{i.data_vencimento}</td>
-                <td className="whitespace-nowrap border">{i.descricao_ciclo}</td>
-
               </tr>
-            )) : 'bbbbbb'}
+            )) : ''}
             <tr></tr>
           </table>
         </div>
