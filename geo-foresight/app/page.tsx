@@ -133,7 +133,7 @@ export default function Home() {
                   <td>197358</td>
                 </tr>
                 <tr>
-                  <th>Início da colheita</th>
+                  <th>Início da colheita &nbsp;</th>
                   <td>03/02/2024</td>
                 </tr>
               </table>
