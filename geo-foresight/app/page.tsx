@@ -2,7 +2,7 @@
 
 import "leaflet/dist/leaflet.css"
 
-import {MapContainer, TileLayer, Rectangle} from "react-leaflet"
+import { MapContainer, TileLayer, Rectangle, Tooltip, Polygon } from "react-leaflet"
 import { useState } from "react";
 
 export default function Home() {
@@ -71,22 +71,76 @@ export default function Home() {
   }
 
   const rectangle = [
-    [51.49, -0.08],
+    [51.49, -1.08],
     [51.5, -0.06],
   ]
 
-  return (
-   <div>
-    <MapContainer center={[51.505, -0.09]} zoom={13}>
-      <TileLayer 
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+  const multiPolygon = [
+    [
+      [51.51, -0.12],
+      [51.51, -0.13],
+      [51.53, -0.13],
+      [51.53, -0.12],
+    ],
+    [
+      [51.51, -0.05],
+      [51.51, -0.07],
+      [51.53, -0.07],
+    ],
+  ]
 
-<Rectangle bounds={rectangle} pathOptions={{ color: 'black' }}>
-      
-    </Rectangle>
-    </MapContainer>
-   </div>
+  return (
+    <div className="relative">
+      <nav className="h-[50px] w-full bg-[#10135E] flex justify-center items-center">
+        <div className="flex bg-white w-max p-[10px] text-[15px] rounded-[5px]">
+          <span className="pr-[8px] border-r-[2px] cursor-default">Filtros</span>
+          <ul className="flex">
+            <li className="flex items-center pr-[8px] border-r-[2px]">
+              <span className="ml-[8px] mr-[6px] cursor-default">Código</span>
+              <input className="cursor-pointer" type="checkbox" name="" id="" />
+            </li>
+            <li className="flex items-center pr-[8px] border-r-[2px]">
+              <span className="ml-[8px] mr-[6px] cursor-default">Início da colheita</span>
+              <input className="cursor-pointer" type="checkbox" name="" id="" />
+            </li>
+            <li className="flex items-center">
+              <span className="ml-[8px] mr-[6px] cursor-default">Fim da colheita</span>
+              <input className="cursor-pointer" type="checkbox" name="" id="" />
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <div className="absolute bg-white w-[300px] h-max z-[404] mx-auto inset-0 top-[55px] rounded-[5px] shadow-2xl">
+        <div className="m-[20px]">
+          <input className="w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[3px]" placeholder="Código" type="text" name="" id="" />
+          <input className="w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[3px]" placeholder="Início da colheita" type="text" name="" id="" />
+          <input className="w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Fim da colheita" type="text" name="" id="" />
+          <button className="bg-[#11145e] text-white w-full rounded-[5px] p-[3px]">Localizar</button>
+        </div>
+      </div>
+      <MapContainer center={[51.505, -0.09]} zoom={13}>
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+
+        <Polygon pathOptions={{ color: 'purple' }} positions={multiPolygon}>
+          <Tooltip sticky>
+            <div className="flex flex-col text-left">
+              <table>
+                <tr>
+                  <th>Código</th>
+                  <td>197358</td>
+                </tr>
+                <tr>
+                  <th>Início da colheita</th>
+                  <td>03/02/2024</td>
+                </tr>
+              </table>
+            </div>
+          </Tooltip>
+        </Polygon>
+      </MapContainer>
+    </div>
   );
 }
