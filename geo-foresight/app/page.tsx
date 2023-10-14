@@ -7,7 +7,26 @@ import { useState, useEffect } from "react";
 
 export default function Home() {
 
+  const [resultadoPesquisa, setResultadoPesquisa] = useState([])
+
   let mock = [
+    {
+      "ref_bacen": 506098917,
+      "nu_identificador": 1,
+      "coordenadas": "-25.5130381,-53.3615784/-25.5132523,-53.3612565/-25.5130847,-53.3610022/-25.5130444,-53.3609947/-25.5130158,-53.3610156/-25.5129978,-53.3610092/-25.512955,-53.3609867/-25.5127603,-53.3609894/-25.5127176,-53.361035/-25.51272,-53.3611154/-25.5128633,-53.3613531/-25.5129366,-53.361381/-25.5129856,-53.3613815/-25.5130284,-53.3614486/-25.5130755,-53.3614475/-25.5131182,-53.361441/-25.5131017,-53.3614904/-25.5130298,-53.3615108/-25.5130332,-53.361565",
+      "inicio_plantio": "2018-08-02",
+      "final_plantio": "2018-02-09",
+      "data_vencimento": "2018-25-10",
+      "inicio_colheita": "2018-29-06",
+      "final_colheita": "2018-15-07",
+      "descricao_irrigacao": "Não Irrigado",
+      "descricao_producao": "Anual",
+      "descricao_grao": "Grão/Consumo",
+      "solo": "terra",
+      "clima": "quente",
+      "ciclo_cultivo": "ciclo",
+      "estado": "SP"
+    },
     {
       "ref_bacen": 5555555,
       "nu_ponto": 1,
@@ -95,25 +114,15 @@ export default function Home() {
     }
   ]
 
-  mock.forEach(gleba => {
-    let coordenadasLista = []
-    const coordenadas = (gleba.coordenadas).split('/')
-    coordenadas.forEach(coordenada => {
-      const teste = coordenada.split(',')
-      coordenadasLista.push(teste)
-    })
-    gleba.coordenadas = coordenadasLista
-  })
-
-
   let resultJSON
-  const [data, setData] = useState(null);
-  const [centro, setCentro] = useState([-23.0666038, -45.7199816])
+  const [data, setData] = useState([]);
+  const [centro, setCentro] = useState([-15.7217003,-48.1021702])
   const [zoom, setZoom] = useState(6)
 
   function handleSearch() {
 
-    let resultado
+    document.querySelector('.localizar').style.display = 'none'
+    document.querySelector('.loading').style.display = 'block'
 
     const fields = {
       ref_bacen: (document.querySelector('#in_codigo').value == '') ? 'NULL' : document.querySelector('#in_codigo').value,
@@ -160,23 +169,32 @@ export default function Home() {
     //   .then(result => grava(result))
     //   .catch(error => console.log('error', error));
 
-    console.log(raw)
+    grava(mock)
 
   }
 
   function grava(r: string) {
-    const jsonResult = JSON.parse(r)
-    setData(jsonResult)
+
+    // const jsonResult = JSON.parse(r)
+
+    mock.forEach(gleba => {
+      let coordenadasLista = []
+      const coordenadas = (gleba.coordenadas).split('/')
+      coordenadas.forEach(coordenada => {
+        const teste = coordenada.split(',')
+        coordenadasLista.push(teste)
+      })
+      gleba.coordenadas = coordenadasLista
+    })
+
+    setData(mock)
   }
 
-  const multiPolygon = [
-    [
-      [51.51, -0.12],
-      [51.51, -0.13],
-      [51.53, -0.13],
-      [51.53, -0.12],
-    ]
-  ]
+  useEffect(() => {
+    if(data.length > 0){
+      changeCenter()
+    }
+  }, [data]);
 
   function generateForm() {
     const checkboxFields = document.querySelectorAll('.checkboxField')
@@ -193,8 +211,10 @@ export default function Home() {
   }
 
   function changeCenter() {
-    setCentro(mock[0].coordenadas[0])
-    setZoom(15)
+    setCentro(data[0].coordenadas[0])
+    setZoom(17)
+    document.querySelector('.localizar').style.display = 'block'
+    document.querySelector('.loading').style.display = 'none'
   }
 
   return (
@@ -268,18 +288,20 @@ export default function Home() {
           <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Clima" type="text" name="" id="in_clima" />
           <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Ciclo do cultivo" type="text" name="" id="in_ciclo_do_cultivo" />
           <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Estado" type="text" name="" id="in_estado" />
-          <button className="bg-[#11145e] text-white w-full rounded-[5px] p-[3px]" onClick={changeCenter}>Localizar</button>
+          <button className="bg-[#11145e] text-white w-full rounded-[5px] p-[3px] flex justify-center items-center h-[30px]" onClick={handleSearch}>
+            <span className="localizar">Localizar</span>
+            <span className="loading"></span>
+          </button>
         </div>
       </div>
 
-      {/* <MapContainer center={mock[0].coordenadas[0]} zoom={15}> */}
       <MapContainer key={centro.toString()} center={centro} zoom={zoom}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        {mock ? (mock.map((gleba) => (
+        {data ? (data.map((gleba) => (
           <Polygon key={gleba.coordenadas} pathOptions={{ color: 'red' }} positions={gleba.coordenadas}>
             <Tooltip sticky>
               <div className="flex flex-col text-left">
