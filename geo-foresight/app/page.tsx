@@ -40,6 +40,7 @@ export default function Home() {
 
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
     var raw = JSON.stringify({
       "ref_bacen": fields.ref_bacen,
