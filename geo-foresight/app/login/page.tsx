@@ -3,42 +3,42 @@ import React from 'react'
 
 const Login = () => {
 
+  function handleClick() {
+    const email = document.querySelector('.in-email').value
+    const pass = document.querySelector('.in-pass').value
+
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    var raw = JSON.stringify({
+      "email": email,
+      "senha": pass,
+    });
+
+    var requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: raw,
+      redirect: 'follow'
+    };
+
+    fetch("http://127.0.0.1:5000/login/", requestOptions)
+      .then(response => response.text())
+      .then(result => signIn(result))
+      .catch(error => console.log('error', error));
+
+  }
+
+  function signIn(res: string) {
+    const jsonResult = JSON.parse(res)
+    console.log(jsonResult)
+    if(jsonResult.access_token){
+      localStorage.setItem('token', jsonResult.access_token)
+      window.location.href = '/'
+    }
+  }
+
   if(!localStorage.getItem('token')){
-    function handleClick() {
-      const email = document.querySelector('.in-email').value
-      const pass = document.querySelector('.in-pass').value
-  
-      var myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-  
-      var raw = JSON.stringify({
-        "email": email,
-        "senha": pass,
-      });
-  
-      var requestOptions = {
-        method: 'POST',
-        headers: myHeaders,
-        body: raw,
-        redirect: 'follow'
-      };
-  
-      fetch("http://127.0.0.1:5000/login/", requestOptions)
-        .then(response => response.text())
-        .then(result => signIn(result))
-        .catch(error => console.log('error', error));
-  
-  
-    }
-  
-    function signIn(res: string) {
-      const jsonResult = JSON.parse(res)
-      console.log(jsonResult)
-      if(jsonResult.access_token){
-        localStorage.setItem('token', jsonResult.access_token)
-        window.location.href = '/'
-      }
-    }
   
     return (
       <div className='flex w-full h-screen justify-center items-center'>
