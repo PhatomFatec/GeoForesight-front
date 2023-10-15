@@ -1,9 +1,8 @@
 'use client'
 
+import { useState } from "react";
 import "leaflet/dist/leaflet.css"
-
 import { MapContainer, TileLayer, Rectangle, Tooltip, Polygon } from "react-leaflet"
-import { useState, useEffect } from "react";
 
 export default function Home() {
 
