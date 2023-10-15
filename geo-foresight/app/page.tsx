@@ -125,18 +125,18 @@ export default function Home() {
     document.querySelector('.loading').style.display = 'block'
 
     const fields = {
-      ref_bacen: (document.querySelector('#in_codigo').value == '') ? 'NULL' : document.querySelector('#in_codigo').value,
-      inicio_plantio: (document.querySelector('#in_inicio_do_plantio').value == '') ? 'NULL' : document.querySelector('#in_inicio_do_plantio').value,
-      final_plantio: (document.querySelector('#in_final_do_plantio').value == '') ? 'NULL' : document.querySelector('#in_final_do_plantio').value,
-      inicio_colheita: (document.querySelector('#in_inicio_da_colheita').value == '') ? 'NULL' : document.querySelector('#in_inicio_da_colheita').value,
-      final_colheita: (document.querySelector('#in_final_da_colheita').value == '') ? 'NULL' : document.querySelector('#in_final_da_colheita').value,
-      grao: (document.querySelector('#in_grao').value == '') ? 'NULL' : document.querySelector('#in_grao').value,
-      producao: (document.querySelector('#in_producao').value == '') ? 'NULL' : document.querySelector('#in_producao').value,
-      irrigacao: (document.querySelector('#in_irrigacao').value == '') ? 'NULL' : document.querySelector('#in_irrigacao').value,
-      solo: (document.querySelector('#in_solo').value == '') ? 'NULL' : document.querySelector('#in_solo').value,
-      clima: (document.querySelector('#in_clima').value == '') ? 'NULL' : document.querySelector('#in_clima').value,
-      ciclo_do_cultivo: (document.querySelector('#in_ciclo_do_cultivo').value == '') ? 'NULL' : document.querySelector('#in_ciclo_do_cultivo').value,
-      estado: (document.querySelector('#in_estado').value == '') ? 'NULL' : document.querySelector('#in_estado').value,
+      ref_bacen: (document.querySelector('#in_codigo').value == '') ? null : document.querySelector('#in_codigo').value,
+      inicio_plantio: (document.querySelector('#in_inicio_do_plantio').value == '') ? null : document.querySelector('#in_inicio_do_plantio').value,
+      final_plantio: (document.querySelector('#in_final_do_plantio').value == '') ? null : document.querySelector('#in_final_do_plantio').value,
+      inicio_colheita: (document.querySelector('#in_inicio_da_colheita').value == '') ? null : document.querySelector('#in_inicio_da_colheita').value,
+      final_colheita: (document.querySelector('#in_final_da_colheita').value == '') ? null : document.querySelector('#in_final_da_colheita').value,
+      grao: (document.querySelector('#in_grao').value == '') ? null : document.querySelector('#in_grao').value,
+      producao: (document.querySelector('#in_producao').value == '') ? null : document.querySelector('#in_producao').value,
+      irrigacao: (document.querySelector('#in_irrigacao').value == '') ? null : document.querySelector('#in_irrigacao').value,
+      solo: (document.querySelector('#in_solo').value == '') ? null : document.querySelector('#in_solo').value,
+      clima: (document.querySelector('#in_clima').value == '') ? null : document.querySelector('#in_clima').value,
+      ciclo_do_cultivo: (document.querySelector('#in_ciclo_do_cultivo').value == '') ? null : document.querySelector('#in_ciclo_do_cultivo').value,
+      // estado: (document.querySelector('#in_estado').value == '') ? null : document.querySelector('#in_estado').value,
     }
 
     var myHeaders = new Headers();
@@ -154,7 +154,11 @@ export default function Home() {
       "descricao_solo": fields.solo,
       "descricao_clima": fields.clima,
       "descricao_ciclo": fields.ciclo_do_cultivo,
-      "estado": fields.estado,
+      "descricao_cultiva": null,
+      "descricao_evento": null,
+      // "estado": fields.estado,
+      "nu_identificador": null,
+      "altitude": null,
     });
 
     var requestOptions = {
@@ -164,20 +168,18 @@ export default function Home() {
       redirect: 'follow'
     };
 
-    // fetch("http://127.0.0.1:5000/consulta_dinamica/", requestOptions)
-    //   .then(response => response.text())
-    //   .then(result => grava(result))
-    //   .catch(error => console.log('error', error));
-
-    grava(mock)
+    fetch("http://127.0.0.1:5000/consultaTeste/", requestOptions)
+      .then(response => response.text())
+      .then(result => grava(result))
+      .catch(error => console.log('error', error));
 
   }
 
   function grava(r: string) {
 
-    // const jsonResult = JSON.parse(r)
+    const jsonResult = JSON.parse(r)
 
-    mock.forEach(gleba => {
+    jsonResult.forEach(gleba => {
       let coordenadasLista = []
       const coordenadas = (gleba.coordenadas).split('/')
       coordenadas.forEach(coordenada => {
@@ -187,7 +189,7 @@ export default function Home() {
       gleba.coordenadas = coordenadasLista
     })
 
-    setData(mock)
+    setData(jsonResult)
   }
 
   useEffect(() => {
@@ -263,14 +265,14 @@ export default function Home() {
               <span className="ml-[8px] mr-[6px] cursor-default">Clima</span>
               <input onChange={generateForm} className="checkboxField cursor-pointer" type="checkbox" name="in_clima" id="ch_clima" />
             </li>
-            <li className="flex items-center pr-[8px] border-r-[2px]">
+            <li className="flex items-center">
               <span className="ml-[8px] mr-[6px] cursor-default">Ciclo do cultivo</span>
               <input onChange={generateForm} className="checkboxField cursor-pointer" type="checkbox" name="in_ciclo_do_cultivo" id="ch_ciclo_do_cultivo" />
             </li>
-            <li className="flex items-center">
+            {/* <li className="flex items-center">
               <span className="ml-[8px] mr-[6px] cursor-default">Estado</span>
               <input onChange={generateForm} className="checkboxField cursor-pointer" type="checkbox" name="in_estado" id="ch_estado" />
-            </li>
+            </li> */}
           </ul>
         </div>
       </nav>
@@ -287,7 +289,7 @@ export default function Home() {
           <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Solo" type="text" name="" id="in_solo" />
           <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Clima" type="text" name="" id="in_clima" />
           <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Ciclo do cultivo" type="text" name="" id="in_ciclo_do_cultivo" />
-          <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Estado" type="text" name="" id="in_estado" />
+          {/* <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Estado" type="text" name="" id="in_estado" /> */}
           <button className="bg-[#11145e] text-white w-full rounded-[5px] p-[3px] flex justify-center items-center h-[30px]" onClick={handleSearch}>
             <span className="localizar">Localizar</span>
             <span className="loading"></span>
@@ -341,19 +343,19 @@ export default function Home() {
                     </tr>
                     <tr>
                       <th>Solo &nbsp;</th>
-                      <td>{gleba.solo}</td>
+                      <td>{gleba.descricao_solo}</td>
                     </tr>
-                    <tr>
+                    {/* <tr>
                       <th>Clima &nbsp;</th>
-                      <td>{gleba.clima}</td>
+                      <td>{gleba.descricao_clima}</td>
+                    </tr> */}
+                    <tr>
+                      <th>Evento climático &nbsp;</th>
+                      <td>{gleba.descricao_evento}</td>
                     </tr>
                     <tr>
-                      <th>Ciclo do cultivo &nbsp;</th>
-                      <td>{gleba.ciclo_cultivo}</td>
-                    </tr>
-                    <tr>
-                      <th>Estado &nbsp;</th>
-                      <td>{gleba.estado}</td>
+                      <th>Cultivar &nbsp;</th>
+                      <td>{gleba.descricao_cultiva}</td>
                     </tr>
                   </tbody>
                 </table>
