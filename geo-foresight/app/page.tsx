@@ -6,11 +6,12 @@ import "leaflet/dist/leaflet.css"
 
 export default function Home() {
 
+  const [resultadoPesquisa, setResultadoPesquisa] = useState([])
+    const [data, setData] = useState([]);
+    const [centro, setCentro] = useState([-15.7217003, -48.1021702])
+    const [zoom, setZoom] = useState(6)
+
   if (localStorage.getItem('token')) {
-
-
-
-    const [resultadoPesquisa, setResultadoPesquisa] = useState([])
 
     let mock = [
       {
@@ -116,11 +117,6 @@ export default function Home() {
         "estado": "RS"
       }
     ]
-
-    let resultJSON
-    const [data, setData] = useState([]);
-    const [centro, setCentro] = useState([-15.7217003, -48.1021702])
-    const [zoom, setZoom] = useState(6)
 
     function handleSearch() {
 
