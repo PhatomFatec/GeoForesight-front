@@ -22,3 +22,20 @@ body {
 .leaflet-container{
   height: calc(100vh - 50px);
 }
+
+.loading{
+  width: 15px;
+  height: 15px;
+  border: 2px solid white;
+  border-top-color: #28527a;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  position: relative;
+  display: none;
+}
+
+@keyframes spin{
+  to{
+    transform: rotate(360deg);
+  }
+}
