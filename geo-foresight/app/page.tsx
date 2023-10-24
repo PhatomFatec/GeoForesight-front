@@ -17,6 +17,12 @@ export default function Home() {
     }
   }, [data]);
 
+  document.addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+      handleSearch()
+    }
+  });
+
 
   function handleSearch() {
 
@@ -52,10 +58,9 @@ export default function Home() {
       "descricao_producao": fields.producao,
       "descricao_irrigacao": fields.irrigacao,
       "descricao_solo": fields.solo,
-      "descricao_clima": fields.clima,
+      "descricao_evento": fields.clima,
       "descricao_ciclo": fields.ciclo_do_cultivo,
-      "descricao_cultiva": null,
-      "descricao_evento": null,
+      "descricao_cultiva": fields.ciclo_do_cultivo,
       // "estado": fields.estado,
       "nu_identificador": fields.estado,
       "altitude": null,
@@ -209,7 +214,7 @@ export default function Home() {
           />
 
           {data ? (data.map((gleba) => (
-            <Polygon key={gleba.coordenadas} pathOptions={{ color: 'red' }} positions={gleba.coordenadas}>
+            <Polygon key={gleba.coordenadas} pathOptions={{ color: 'blue' }} positions={gleba.coordenadas}>
               <Tooltip sticky>
                 <div className="flex flex-col text-left">
                   <table>
