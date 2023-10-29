@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Rectangle, Tooltip, Polygon } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
+import 'react-notifications/lib/notifications.css';
+import { NotificationContainer, NotificationManager } from 'react-notifications';
 
 export default function Home() {
 
@@ -17,7 +19,7 @@ export default function Home() {
     }
   }, [data]);
 
-  document.addEventListener('keypress', function(event) {
+  document.addEventListener('keypress', function (event) {
     if (event.key === 'Enter') {
       handleSearch()
     }
@@ -76,8 +78,12 @@ export default function Home() {
     fetch("http://127.0.0.1:5000/consultaTeste/", requestOptions)
       .then(response => response.text())
       .then(result => grava(result))
-      .catch(error => console.log('error', error));
-
+      .catch(error => {
+        console.log('error', error)
+        NotificationManager.error('Erro na requisição');
+        document.querySelector('.loading').style.display = 'none'
+        document.querySelector('.localizar').style.display = 'block'
+      });
   }
 
   function grava(r: string) {
@@ -126,11 +132,35 @@ export default function Home() {
     window.location.href = '/login'
   }
 
+  function emailNotification(){
+    const notOnIcon = document.getElementById('notOn')
+    const notOffIcon = document.getElementById('notOff')
+    if (notOnIcon.style.display != 'none'){
+      notOnIcon.style.display = 'none'
+      notOffIcon.style.display = 'block'
+      NotificationManager.success('Notificações desabilitadas');
+    }
+    else{
+      notOnIcon.style.display = 'block'
+      notOffIcon.style.display = 'none'
+      NotificationManager.success('Notificações habilitadas');
+    }
+    
+  }
+
   if (localStorage.getItem('token')) {
 
     return (
       <div className="relative">
-        <nav className="h-[50px] w-full bg-[#10135E] flex justify-center items-center">
+        <div onClick={emailNotification} className="fixed z-[1000] bg-white w-[50px] h-[50px] bottom-3 left-3 rounded-[25px] flex items-center shadow-lg flex-row overflow-hidden hover:w-[246px] emailAnimation cursor-pointer">
+          <div className="svg min-w-[50px] h-[50px] flex justify-center items-center ">
+            <svg id="notOn" className="" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            <svg id="notOff" className="text-[red] hidden" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M13.73 21a2 2 0 0 1-3.46 0"></path><path d="M18.63 13A17.89 17.89 0 0 1 18 8"></path><path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"></path><path d="M18 8a6 6 0 0 0-9.33-5"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+          </div>
+          <p className="min-w-max">Notificações por e-mail</p>
+        </div>
+        <nav className="h-[50px] w-full absolute z-[500] flex justify-center items-center">
+          <NotificationContainer />
           <div className="flex bg-white w-max p-[10px] text-[15px] rounded-[5px]">
             <span className="pr-[8px] border-r-[2px] cursor-default">Filtros</span>
             <ul className="flex">
@@ -197,7 +227,12 @@ export default function Home() {
             <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Produção" type="text" name="" id="in_producao" />
             <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Irrigação" type="text" name="" id="in_irrigacao" />
             <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Solo" type="text" name="" id="in_solo" />
-            <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Clima" type="text" name="" id="in_clima" />
+            {/* <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Clima" type="text" name="" id="in_clima" /> */}
+            <select className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" name="in_clima" id="in_clima">
+              <option value="seco">seco</option>
+              <option value="úmido">úmido</option>
+              <option value="outro">outro</option>
+            </select>
             <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Ciclo do cultivo" type="text" name="" id="in_ciclo_do_cultivo" />
             <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Identificador" type="text" name="" id="in_identificador" />
             <button className="bg-[#11145e] text-white w-full rounded-[5px] p-[3px] flex justify-center items-center h-[30px]" onClick={handleSearch}>
@@ -277,8 +312,6 @@ export default function Home() {
               </Tooltip>
             </Polygon>
           ))) : null}
-
-
         </MapContainer>
       </div>
     );
