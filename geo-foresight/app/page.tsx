@@ -51,22 +51,49 @@ export default function Home() {
     myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
     var raw = JSON.stringify({
+      // "ref_bacen": fields.ref_bacen,
+      // "nu_identificador": null,
+      // "coordenadas": null,
+      // "altitude": null,
+      // "inicio_plantio": fields.inicio_plantio,
+      // "final_plantio": fields.final_plantio,
+      // "data_liberacao": null,
+      // "data_vencimento": null,
+      // "inicio_colheita": fields.inicio_colheita,
+      // "final_colheita": fields.final_colheita,
+      // "descricao_grao": fields.grao,
+      // "descricao_producao": fields.producao,
+      // "descricao_irrigacao": fields.irrigacao,
+      // "descricao_solo": fields.solo,
+      // "descricao_evento": fields.clima,
+      // "descricao_ciclo": fields.ciclo_do_cultivo,
+      // "descricao_cultiva": fields.ciclo_do_cultivo,
+      // "estado": null,
+      // "municipio": null,
+      // "produto": null
       "ref_bacen": fields.ref_bacen,
+      "nu_identificador": null,
+      "coordenadas": null,
+      "altitude": null,
       "inicio_plantio": fields.inicio_plantio,
       "final_plantio": fields.final_plantio,
+      "data_liberacao": null,
+      "data_vencimento": null,
       "inicio_colheita": fields.inicio_colheita,
       "final_colheita": fields.final_colheita,
-      "descricao_grao": fields.grao,
-      "descricao_producao": fields.producao,
       "descricao_irrigacao": fields.irrigacao,
       "descricao_solo": fields.solo,
-      "descricao_evento": fields.clima,
-      "descricao_ciclo": fields.ciclo_do_cultivo,
-      "descricao_cultiva": fields.ciclo_do_cultivo,
-      // "estado": fields.estado,
-      "nu_identificador": fields.estado,
-      "altitude": null,
+      "descricao_evento": null,
+      "descricao_cultiva": null,
+      "descricao_ciclo": null,
+      "descricao_grao": null,
+      "descricao_producao": null,
+      "estado": "SP",
+      "municipio": null,
+      "produto": null
     });
+
+    console.log(raw)
 
     var requestOptions = {
       method: 'POST',
@@ -132,21 +159,23 @@ export default function Home() {
     window.location.href = '/login'
   }
 
-  function emailNotification(){
+  function emailNotification() {
     const notOnIcon = document.getElementById('notOn')
     const notOffIcon = document.getElementById('notOff')
-    if (notOnIcon.style.display != 'none'){
+    if (notOnIcon.style.display != 'none') {
       notOnIcon.style.display = 'none'
       notOffIcon.style.display = 'block'
       NotificationManager.success('Notificações desabilitadas');
     }
-    else{
+    else {
       notOnIcon.style.display = 'block'
       notOffIcon.style.display = 'none'
       NotificationManager.success('Notificações habilitadas');
     }
-    
+
   }
+
+  // leaflet-interactive
 
   if (localStorage.getItem('token')) {
 
@@ -249,6 +278,7 @@ export default function Home() {
           />
 
           {data ? (data.map((gleba) => (
+            <div className="MarcusRocha">
             <Polygon key={gleba.coordenadas} pathOptions={{ color: 'blue' }} positions={gleba.coordenadas}>
               <Tooltip sticky>
                 <div className="flex flex-col text-left">
@@ -260,19 +290,19 @@ export default function Home() {
                       </tr>
                       <tr>
                         <th>Início do plantio &nbsp;</th>
-                        <td>{gleba.inicio_plantio}</td>
+                        <td>{new Date(gleba.inicio_plantio).toLocaleDateString('pt-BR')}</td>
                       </tr>
                       <tr>
                         <th>Final do plantio &nbsp;</th>
-                        <td>{gleba.final_plantio}</td>
+                        <td>{new Date(gleba.final_plantio).toLocaleDateString('pt-BR')}</td>
                       </tr>
                       <tr>
                         <th>Início da colheita &nbsp;</th>
-                        <td>{gleba.inicio_colheita}</td>
+                        <td>{new Date(gleba.inicio_colheita).toLocaleDateString('pt-BR')}</td>
                       </tr>
                       <tr>
                         <th>Fim da colheita &nbsp;</th>
-                        <td>{gleba.final_colheita}</td>
+                        <td>{new Date(gleba.final_colheita).toLocaleDateString('pt-BR')}</td>
                       </tr>
                       <tr>
                         <th>Grão &nbsp;</th>
@@ -311,6 +341,7 @@ export default function Home() {
                 </div>
               </Tooltip>
             </Polygon>
+            </div>
           ))) : null}
         </MapContainer>
       </div>

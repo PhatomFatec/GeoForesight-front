@@ -26,7 +26,16 @@ const Login = () => {
 
     fetch("http://127.0.0.1:5000/login/", requestOptions)
       .then(response => response.text())
-      .then(result => signIn(result))
+      .then(result => {
+        console.log(typeof(JSON.parse(result).access_token))
+        if(typeof(JSON.parse(result).access_token) != undefined){
+          signIn(result)
+          return
+        }
+        if(typeof(JSON.parse(result).message) != undefined){
+          NotificationManager.error(JSON.parse(result).message)
+        }
+      })
       .catch(error => {
         console.log(error)
         NotificationManager.error('Erro na requisição');
