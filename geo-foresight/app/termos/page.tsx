@@ -1,49 +1,93 @@
+'use client'
 import React from 'react'
 
 const Termos = () => {
+
+  let email
+
+  function verificaEmail(){
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
+
+    var requestOptions = {
+      method: 'GET',
+      headers: myHeaders,
+    };
+
+    fetch("http://127.0.0.1:5000/verificar_aceitacao_email", requestOptions)
+      .then(response => response.text())
+      .then(result => {
+        result = JSON.parse(result)
+        console.log(result)
+        if (result.message == 'Envio de email permitido'){
+          email = true
+        }
+        else{
+          email = false
+        }
+        
+      })
+      .catch(error => console.log(error))
+  }
+  verificaEmail()
+
+  function confirma(){
+    var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
+
+      const raw = JSON.stringify({
+        "id_user": localStorage.getItem('user_id'),
+        "id_termo": localStorage.getItem('id_termo'),
+        "aceitacao_padrao": true,
+        "aceitacao_email": email
+      })
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+      };
+
+      fetch("http://127.0.0.1:5000/aceitar_termo", requestOptions)
+        .then(response => response.text())
+        .then(result => {
+          console.log(result)
+          window.location.href = '/'
+        })
+        .catch(error => console.log(error))
+  }
+
+  function logout() {
+    localStorage.clear()
+    window.location.href = '/login'
+  }
+
+  var requestOptions = {
+    method: 'GET',
+  };
+
+  let termo = ''
+
+  fetch("http://127.0.0.1:5000/termo_mais_recente", requestOptions)
+    .then(response => response.text())
+    .then(result => {
+      result = JSON.parse(result)
+      localStorage.setItem('id_termo', result.id)
+      termo = result.termo
+      document.getElementById('termo').innerHTML = termo
+    })
+    .catch(error => { console.log('error', error) });
+
   return (
     <div className='bg-[#e1e1e1] h-[100vh] flex justify-center items-center flex-col'>
-        <h1 className='text-[20px] w-[800px] font-bold'>Atualização nos termos e condições</h1>
-        <div className='bg-white w-[800px] p-[30px] rounded-[5px] max-h-[70vh] overflow-scroll'>
-            <p>TERMOS E CONDIÇÕES GERAIS
-
-1. Introdução
-
-Bem-vindo ao [Nome do Site], um serviço online que fornece informações geográficas e serviços relacionados. Ao acessar e utilizar nosso site, você concorda em cumprir e estar vinculado a estes Termos e Condições Gerais. Se você não concordar com estes termos, por favor, não utilize nosso site.
-
-2. Uso das Informações Geográficas
-
-2.1. Nós fornecemos informações geográficas para fins informativos e de referência apenas. Não garantimos a precisão ou atualização das informações fornecidas. O uso das informações geográficas é por sua conta e risco.
-
-2.2. Você concorda em não utilizar as informações geográficas para qualquer finalidade ilegal ou que viole os direitos de terceiros.
-
-3. Privacidade e Dados Pessoais
-
-3.1. Ao utilizar nosso site, você concorda com nossa Política de Privacidade, que descreve como coletamos, usamos e protegemos seus dados pessoais.
-
-4. Propriedade Intelectual
-
-4.1. Todo o conteúdo presente em nosso site, incluindo, mas não se limitando a textos, imagens, logotipos e software, é protegido por direitos autorais e outras leis de propriedade intelectual.
-
-4.2. Você concorda em respeitar todos os direitos autorais e outras informações de propriedade contidas em nosso site.
-
-5. Limitação de Responsabilidade
-
-5.1. Não nos responsabilizamos por danos diretos, indiretos, incidentais, consequentes ou especiais que possam surgir do uso ou da incapacidade de usar nosso site ou informações geográficas.
-
-6. Modificações nos Termos
-
-6.1. Reservamos o direito de modificar estes Termos e Condições Gerais a qualquer momento. As modificações serão efetivas assim que forem publicadas em nosso site.
-
-7. Lei Aplicável
-
-7.1. Estes Termos e Condições Gerais serão regidos e interpretados de acordo com as leis do [Nome do País].
-
-8. Contato
-
-8.1. Se você tiver alguma dúvida ou preocupação sobre estes Termos e Condições Gerais, entre em contato conosco em [Endereço de Email de Contato].</p>
-        </div>
-        <button className='mt-[50px] bg-[#28527a] px-[20px] py-[10px] rounded-[5px] font-bold text-[#fff]'>Li e concordo com os Termos e Condições</button>
+      <div className="absolute right-2 top-2 h-[42px] w-[42px] bg-white rounded-[5px] flex items-center justify-center cursor-pointer" onClick={logout}><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className="css-i6dzq1"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></div>
+      <h1 className='text-[20px] w-[800px] font-bold'>Atualização nos termos e condições</h1>
+      <div className='bg-white w-[800px] p-[30px] rounded-[5px] max-h-[70vh] overflow-y-scroll'>
+        <p id='termo'></p>
+      </div>
+      <button onClick={confirma} className='mt-[50px] bg-[#28527a] px-[20px] py-[10px] rounded-[5px] font-bold text-[#fff]'>Li e concordo com os Termos e Condições</button>
     </div>
   )
 }
