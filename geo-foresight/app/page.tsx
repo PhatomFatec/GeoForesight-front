@@ -8,6 +8,8 @@ import { NotificationContainer, NotificationManager } from 'react-notifications'
 
 export default function Home() {
 
+  let dataa
+
   const [resultadoPesquisa, setResultadoPesquisa] = useState([])
   const [data, setData] = useState([]);
   const [centro, setCentro] = useState([-15.7217003, -48.1021702])
@@ -43,7 +45,8 @@ export default function Home() {
       solo: (document.querySelector('#in_solo').value == '') ? null : document.querySelector('#in_solo').value,
       clima: (document.querySelector('#in_clima').value == '') ? null : document.querySelector('#in_clima').value,
       ciclo_do_cultivo: (document.querySelector('#in_ciclo_do_cultivo').value == '') ? null : document.querySelector('#in_ciclo_do_cultivo').value,
-      estado: (document.querySelector('#in_identificador').value == '') ? null : document.querySelector('#in_identificador').value,
+      estado: (document.querySelector('#in_estado').value == '') ? null : document.querySelector('#in_estado').value,
+      municipio: (document.querySelector('#in_municipio').value == '') ? null : document.querySelector('#in_municipio').value,
     }
 
     var myHeaders = new Headers();
@@ -51,22 +54,48 @@ export default function Home() {
     myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
     var raw = JSON.stringify({
+      // "ref_bacen": fields.ref_bacen,
+      // "nu_identificador": null,
+      // "coordenadas": null,
+      // "altitude": null,
+      // "inicio_plantio": fields.inicio_plantio,
+      // "final_plantio": fields.final_plantio,
+      // "data_liberacao": null,
+      // "data_vencimento": null,
+      // "inicio_colheita": fields.inicio_colheita,
+      // "final_colheita": fields.final_colheita,
+      // "descricao_grao": fields.grao,
+      // "descricao_producao": fields.producao,
+      // "descricao_irrigacao": fields.irrigacao,
+      // "descricao_solo": fields.solo,
+      // "descricao_evento": fields.clima,
+      // "descricao_ciclo": fields.ciclo_do_cultivo,
+      // "descricao_cultiva": fields.ciclo_do_cultivo,
+      // "estado": null,
+      // "municipio": null,
+      // "produto": null
       "ref_bacen": fields.ref_bacen,
+      "nu_identificador": null,
+      "coordenadas": null,
+      "altitude": null,
       "inicio_plantio": fields.inicio_plantio,
       "final_plantio": fields.final_plantio,
+      "data_liberacao": null,
+      "data_vencimento": null,
       "inicio_colheita": fields.inicio_colheita,
       "final_colheita": fields.final_colheita,
-      "descricao_grao": fields.grao,
-      "descricao_producao": fields.producao,
       "descricao_irrigacao": fields.irrigacao,
       "descricao_solo": fields.solo,
       "descricao_evento": fields.clima,
-      "descricao_ciclo": fields.ciclo_do_cultivo,
       "descricao_cultiva": fields.ciclo_do_cultivo,
-      // "estado": fields.estado,
-      "nu_identificador": fields.estado,
-      "altitude": null,
+      "descricao_ciclo": null,
+      "descricao_grao": fields.grao,
+      "descricao_producao": fields.producao,
+      "estado": fields.estado,
+      "municipio": fields.municipio,
+      "produto": null
     });
+    console.log(JSON.parse(raw))
 
     var requestOptions = {
       method: 'POST',
@@ -104,6 +133,12 @@ export default function Home() {
     })
 
     setData(jsonResult)
+
+    dataa = jsonResult
+
+    setTimeout(() => {
+      glebaEventListener()
+    }, "1000");
   }
 
 
@@ -132,20 +167,155 @@ export default function Home() {
     window.location.href = '/login'
   }
 
-  function emailNotification(){
+  function loadIconNotification() {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
+
+    var requestOptions = {
+      method: 'GET',
+      headers: myHeaders,
+    };
+
+    fetch("http://127.0.0.1:5000/verificar_aceitacao_email", requestOptions)
+      .then(response => response.text())
+      .then(result => {
+        result = JSON.parse(result)
+        if (result.message == "Envio de email permitido") {
+          setTimeout(() => {
+            document.querySelector("#notOn").style.display = 'block'
+            document.querySelector("#notOff").style.display = 'none'
+
+            emailLiberado = true
+          }, "1000");
+        }
+        else {
+          setTimeout(() => {
+            document.querySelector("#notOn").style.display = 'none'
+            document.querySelector("#notOff").style.display = 'block'
+
+            emailLiberado = false
+          }, "1000");
+        }
+      })
+      .catch(error => console.log(error))
+  }
+
+  let emailLiberado = ''
+
+  loadIconNotification()
+
+  function emailNotification() {
     const notOnIcon = document.getElementById('notOn')
     const notOffIcon = document.getElementById('notOff')
-    if (notOnIcon.style.display != 'none'){
-      notOnIcon.style.display = 'none'
-      notOffIcon.style.display = 'block'
-      NotificationManager.success('Notificações desabilitadas');
+    if (emailLiberado) {
+
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
+
+      const raw = JSON.stringify({
+        "id_user": localStorage.getItem('user_id'),
+        "id_termo": localStorage.getItem('id_termo'),
+        "aceitacao_padrao": true,
+        "aceitacao_email": false
+      })
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+      };
+
+      fetch("http://127.0.0.1:5000/aceitar_termo", requestOptions)
+        .then(response => response.text())
+        .then(result => {
+          console.log(result)
+          notOnIcon.style.display = 'none'
+          notOffIcon.style.display = 'block'
+          NotificationManager.success('Notificações desabilitadas');
+          loadIconNotification()
+        })
+        .catch(error => {
+          console.log(error)
+          NotificationManager.error('Erro na requisição');
+        })
+
     }
-    else{
-      notOnIcon.style.display = 'block'
-      notOffIcon.style.display = 'none'
-      NotificationManager.success('Notificações habilitadas');
+    else {
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
+
+      const raw = JSON.stringify({
+        "id_user": localStorage.getItem('user_id'),
+        "id_termo": localStorage.getItem('id_termo'),
+        "aceitacao_padrao": true,
+        "aceitacao_email": true
+      })
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+      };
+
+      fetch("http://127.0.0.1:5000/aceitar_termo", requestOptions)
+        .then(response => response.text())
+        .then(result => {
+          console.log(result)
+          notOnIcon.style.display = 'block'
+          notOffIcon.style.display = 'none'
+          NotificationManager.success('Notificações habilitadas');
+          loadIconNotification()
+        })
+        .catch(error => {
+          console.log(error)
+          NotificationManager.error('Erro na requisição');
+        })
+
     }
-    
+
+  }
+
+  function termo() {
+    var requestOptions = {
+      method: 'GET',
+    };
+
+    fetch("http://127.0.0.1:5000/termo_mais_recente", requestOptions)
+      .then(response => response.text())
+      .then(result => {
+        result = JSON.parse(result)
+        localStorage.setItem('id_termo', result.id)
+      })
+      .catch(error => { console.log('error', error) });
+  }
+
+  termo()
+
+  // leaflet-interactive
+
+  function glebaEventListener() {
+    const glebasIdentificadas = document.querySelectorAll('.leaflet-interactive')
+    glebasIdentificadas.forEach(g => {
+      g.addEventListener("click", function () {
+        const attrProcurado = g.getAttribute('d')
+        let posicaoElemento = -1;
+
+        for(var i = 0; i<glebasIdentificadas.length; i++){
+          var el = glebasIdentificadas[i];
+          var nomeAtributo = el.getAttribute('d');
+
+          if(nomeAtributo === attrProcurado){
+            posicaoElemento = i;
+            break;
+          }
+        }
+        console.log(dataa[posicaoElemento]) // Retornando o array referente à gleba clicada
+      })
+    })
   }
 
   if (localStorage.getItem('token')) {
@@ -154,8 +324,8 @@ export default function Home() {
       <div className="relative">
         <div onClick={emailNotification} className="fixed z-[1000] bg-white w-[50px] h-[50px] bottom-3 left-3 rounded-[25px] flex items-center shadow-lg flex-row overflow-hidden hover:w-[246px] emailAnimation cursor-pointer">
           <div className="svg min-w-[50px] h-[50px] flex justify-center items-center ">
-            <svg id="notOn" className="" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-            <svg id="notOff" className="text-[red] hidden" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M13.73 21a2 2 0 0 1-3.46 0"></path><path d="M18.63 13A17.89 17.89 0 0 1 18 8"></path><path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"></path><path d="M18 8a6 6 0 0 0-9.33-5"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+            <svg id="notOn" className="hidden" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            <svg id="notOff" className="text-[red] hidden" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M13.73 21a2 2 0 0 1-3.46 0"></path><path d="M18.63 13A17.89 17.89 0 0 1 18 8"></path><path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"></path><path d="M18 8a6 6 0 0 0-9.33-5"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
           </div>
           <p className="min-w-max">Notificações por e-mail</p>
         </div>
@@ -205,17 +375,28 @@ export default function Home() {
                 <input onChange={generateForm} className="checkboxField cursor-pointer" type="checkbox" name="in_clima" id="ch_clima" />
               </li>
               <li className="flex items-center">
-                <span className="ml-[8px] mr-[6px] cursor-default">Ciclo do cultivo</span>
+                <span className="ml-[8px] mr-[6px] cursor-default">Cultivo</span>
                 <input onChange={generateForm} className="checkboxField cursor-pointer" type="checkbox" name="in_ciclo_do_cultivo" id="ch_ciclo_do_cultivo" />
               </li>
               <li className="flex items-center">
                 <span className="ml-[8px] mr-[6px] cursor-default">Identificador</span>
                 <input onChange={generateForm} className="checkboxField cursor-pointer" type="checkbox" name="in_identificador" id="ch_identificador" />
               </li>
+              <li className="flex items-center">
+                <span className="ml-[8px] mr-[6px] cursor-default">Estado</span>
+                <input onChange={generateForm} className="checkboxField cursor-pointer" type="checkbox" name="in_estado" id="ch_estado" />
+              </li>
+              <li className="flex items-center">
+                <span className="ml-[8px] mr-[6px] cursor-default">Município</span>
+                <input onChange={generateForm} className="checkboxField cursor-pointer" type="checkbox" name="in_municipio" id="ch_municipio" />
+              </li>
             </ul>
           </div>
-          <div className="absolute right-2 h-[42px] w-[42px] bg-white rounded-[5px] flex items-center justify-center cursor-pointer" onClick={logout}><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></div>
+          <div className="absolute right-2 h-[42px] w-[42px] bg-white rounded-[5px] flex items-center justify-center cursor-pointer" onClick={logout}><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className="css-i6dzq1"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></div>
         </nav>
+        <div className="absolute w-[300px] h-[300px] rounded-[5px] bg-white z-[900] right-2 bottom-6 flex p-[10px] justify-center items-center">
+          <p className="text-center text-[#b5b5b5]">Clique em uma gleba para ver a série temporal</p>
+        </div>
         <div className="absolute bg-white w-[300px] h-max z-[404] mx-auto inset-0 top-[55px] rounded-[5px] shadow-2xl">
           <div className="m-[20px]">
             <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[3px]" placeholder="Código" type="text" name="" id="in_codigo" />
@@ -229,12 +410,15 @@ export default function Home() {
             <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Solo" type="text" name="" id="in_solo" />
             {/* <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Clima" type="text" name="" id="in_clima" /> */}
             <select className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" name="in_clima" id="in_clima">
+              <option value="">Selecione um clima</option>
               <option value="seco">seco</option>
               <option value="úmido">úmido</option>
               <option value="outro">outro</option>
             </select>
-            <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Ciclo do cultivo" type="text" name="" id="in_ciclo_do_cultivo" />
+            <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Cultivo" type="text" name="" id="in_ciclo_do_cultivo" />
             <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Identificador" type="text" name="" id="in_identificador" />
+            <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Estado" type="text" name="" id="in_estado" />
+            <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Município" type="text" name="" id="in_municipio" />
             <button className="bg-[#11145e] text-white w-full rounded-[5px] p-[3px] flex justify-center items-center h-[30px]" onClick={handleSearch}>
               <span className="localizar">Localizar</span>
               <span className="loading"></span>
@@ -249,68 +433,70 @@ export default function Home() {
           />
 
           {data ? (data.map((gleba) => (
-            <Polygon key={gleba.coordenadas} pathOptions={{ color: 'blue' }} positions={gleba.coordenadas}>
-              <Tooltip sticky>
-                <div className="flex flex-col text-left">
-                  <table>
-                    <tbody>
-                      <tr>
-                        <th>ref_bacen</th>
-                        <td>{gleba.ref_bacen}</td>
-                      </tr>
-                      <tr>
-                        <th>Início do plantio &nbsp;</th>
-                        <td>{gleba.inicio_plantio}</td>
-                      </tr>
-                      <tr>
-                        <th>Final do plantio &nbsp;</th>
-                        <td>{gleba.final_plantio}</td>
-                      </tr>
-                      <tr>
-                        <th>Início da colheita &nbsp;</th>
-                        <td>{gleba.inicio_colheita}</td>
-                      </tr>
-                      <tr>
-                        <th>Fim da colheita &nbsp;</th>
-                        <td>{gleba.final_colheita}</td>
-                      </tr>
-                      <tr>
-                        <th>Grão &nbsp;</th>
-                        <td>{gleba.descricao_grao}</td>
-                      </tr>
-                      <tr>
-                        <th>Produção &nbsp;</th>
-                        <td>{gleba.descricao_producao}</td>
-                      </tr>
-                      <tr>
-                        <th>Irrigação &nbsp;</th>
-                        <td>{gleba.descricao_irrigacao}</td>
-                      </tr>
-                      <tr>
-                        <th>Solo &nbsp;</th>
-                        <td>{gleba.descricao_solo}</td>
-                      </tr>
-                      {/* <tr>
+            <div className="MarcusRocha">
+              <Polygon key={gleba.coordenadas} pathOptions={{ color: 'blue' }} positions={gleba.coordenadas}>
+                <Tooltip sticky>
+                  <div className="flex flex-col text-left">
+                    <table>
+                      <tbody>
+                        <tr>
+                          <th>ref_bacen</th>
+                          <td>{gleba.ref_bacen}</td>
+                        </tr>
+                        <tr>
+                          <th>Início do plantio &nbsp;</th>
+                          <td>{new Date(gleba.inicio_plantio).toLocaleDateString('pt-BR')}</td>
+                        </tr>
+                        <tr>
+                          <th>Final do plantio &nbsp;</th>
+                          <td>{new Date(gleba.final_plantio).toLocaleDateString('pt-BR')}</td>
+                        </tr>
+                        <tr>
+                          <th>Início da colheita &nbsp;</th>
+                          <td>{new Date(gleba.inicio_colheita).toLocaleDateString('pt-BR')}</td>
+                        </tr>
+                        <tr>
+                          <th>Fim da colheita &nbsp;</th>
+                          <td>{new Date(gleba.final_colheita).toLocaleDateString('pt-BR')}</td>
+                        </tr>
+                        <tr>
+                          <th>Grão &nbsp;</th>
+                          <td>{gleba.descricao_grao}</td>
+                        </tr>
+                        <tr>
+                          <th>Produção &nbsp;</th>
+                          <td>{gleba.descricao_producao}</td>
+                        </tr>
+                        <tr>
+                          <th>Irrigação &nbsp;</th>
+                          <td>{gleba.descricao_irrigacao}</td>
+                        </tr>
+                        <tr>
+                          <th>Solo &nbsp;</th>
+                          <td>{gleba.descricao_solo}</td>
+                        </tr>
+                        {/* <tr>
                       <th>Clima &nbsp;</th>
                       <td>{gleba.descricao_clima}</td>
                     </tr> */}
-                      <tr>
-                        <th>Evento climático &nbsp;</th>
-                        <td>{gleba.descricao_evento}</td>
-                      </tr>
-                      <tr>
-                        <th>Cultivar &nbsp;</th>
-                        <td>{gleba.descricao_cultiva}</td>
-                      </tr>
-                      <tr>
-                        <th>Identificador &nbsp;</th>
-                        <td>{gleba.nu_identificador}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </Tooltip>
-            </Polygon>
+                        <tr>
+                          <th>Evento climático &nbsp;</th>
+                          <td>{gleba.descricao_evento}</td>
+                        </tr>
+                        <tr>
+                          <th>Cultivar &nbsp;</th>
+                          <td>{gleba.descricao_cultiva}</td>
+                        </tr>
+                        <tr>
+                          <th>Identificador &nbsp;</th>
+                          <td>{gleba.nu_identificador}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </Tooltip>
+              </Polygon>
+            </div>
           ))) : null}
         </MapContainer>
       </div>

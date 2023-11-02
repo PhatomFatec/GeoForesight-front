@@ -24,13 +24,50 @@ const Login = () => {
       redirect: 'follow'
     };
 
-    fetch("http://127.0.0.1:5000/login/", requestOptions)
+    fetch("http://127.0.0.1:5000/login", requestOptions)
       .then(response => response.text())
-      .then(result => signIn(result))
+      .then(result => {
+        console.log(typeof(JSON.parse(result).access_token))
+        console.log(result)
+
+        if(typeof(JSON.parse(result).access_token) != undefined){
+          localStorage.setItem('email', email)
+          signIn(result)
+          return
+        }
+        if(typeof(JSON.parse(result).message) != undefined){
+          NotificationManager.error(JSON.parse(result).message)
+        }
+      })
       .catch(error => {
         console.log(error)
         NotificationManager.error('Erro na requisição');
       });
+
+  }
+
+  function verificaTermo(){
+
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
+
+    var requestOptions = {
+      method: 'GET',
+      headers: myHeaders,
+    };
+
+    fetch("http://127.0.0.1:5000/verificar_aceitacao", requestOptions)
+      .then(response => response.text())
+      .then(result => {
+        result = JSON.parse(result)
+        if(result.message == "Último termo já aceito"){
+          window.location.href = '/'
+        }
+        else{
+          window.location.href = '/termos'
+        }
+      })
+      .catch(error => console.log(error))
 
   }
 
@@ -47,7 +84,9 @@ const Login = () => {
     console.log(jsonResult)
     if (jsonResult.access_token) {
       localStorage.setItem('token', jsonResult.access_token)
-      window.location.href = '/'
+      localStorage.setItem('user_id', jsonResult.user_id)
+      verificaTermo()
+      // window.location.href = '/'
     }
   }
 
