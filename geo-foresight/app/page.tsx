@@ -5,6 +5,7 @@ import { MapContainer, TileLayer, Rectangle, Tooltip, Polygon } from "react-leaf
 import "leaflet/dist/leaflet.css"
 import 'react-notifications/lib/notifications.css';
 import { NotificationContainer, NotificationManager } from 'react-notifications';
+import MyChart from "@/components/myChart";
 
 export default function Home() {
 
@@ -394,8 +395,9 @@ export default function Home() {
           </div>
           <div className="absolute right-2 h-[42px] w-[42px] bg-white rounded-[5px] flex items-center justify-center cursor-pointer" onClick={logout}><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className="css-i6dzq1"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></div>
         </nav>
-        <div className="absolute w-[300px] h-[300px] rounded-[5px] bg-white z-[900] right-2 bottom-6 flex p-[10px] justify-center items-center">
-          <p className="text-center text-[#b5b5b5]">Clique em uma gleba para ver a série temporal</p>
+        <div className="absolute w-[300px] h-[170px] rounded-[5px] bg-white z-[900] right-2 bottom-6 flex p-[10px] justify-center items-center">
+          {/* <p className="text-center text-[#b5b5b5]">Clique em uma gleba para ver a série temporal</p> */}
+          <MyChart />
         </div>
         <div className="absolute bg-white w-[300px] h-max z-[404] mx-auto inset-0 top-[55px] rounded-[5px] shadow-2xl">
           <div className="m-[20px]">
