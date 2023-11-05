@@ -79,7 +79,7 @@ const MyChart = () => {
   };
 
   return (
-    <div className='w-full'>
+    <div className='w-full hidden' id='grafico'>
       <Line data={data} options={options} />
     </div>
   );
