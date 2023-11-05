@@ -55,34 +55,11 @@ export default function Home() {
     myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 
     var raw = JSON.stringify({
-      // "ref_bacen": fields.ref_bacen,
-      // "nu_identificador": null,
-      // "coordenadas": null,
-      // "altitude": null,
-      // "inicio_plantio": fields.inicio_plantio,
-      // "final_plantio": fields.final_plantio,
-      // "data_liberacao": null,
-      // "data_vencimento": null,
-      // "inicio_colheita": fields.inicio_colheita,
-      // "final_colheita": fields.final_colheita,
-      // "descricao_grao": fields.grao,
-      // "descricao_producao": fields.producao,
-      // "descricao_irrigacao": fields.irrigacao,
-      // "descricao_solo": fields.solo,
-      // "descricao_evento": fields.clima,
-      // "descricao_ciclo": fields.ciclo_do_cultivo,
-      // "descricao_cultiva": fields.ciclo_do_cultivo,
-      // "estado": null,
-      // "municipio": null,
-      // "produto": null
       "ref_bacen": fields.ref_bacen,
       "nu_identificador": null,
       "coordenadas": null,
-      "altitude": null,
       "inicio_plantio": fields.inicio_plantio,
       "final_plantio": fields.final_plantio,
-      "data_liberacao": null,
-      "data_vencimento": null,
       "inicio_colheita": fields.inicio_colheita,
       "final_colheita": fields.final_colheita,
       "descricao_irrigacao": fields.irrigacao,
@@ -105,7 +82,7 @@ export default function Home() {
       redirect: 'follow'
     };
 
-    fetch("http://127.0.0.1:5000/consultaTeste/", requestOptions)
+    fetch("http://127.0.0.1:5000/consultaNova", requestOptions)
       .then(response => response.text())
       .then(result => grava(result))
       .catch(error => {
@@ -300,21 +277,31 @@ export default function Home() {
 
   function glebaEventListener() {
     const glebasIdentificadas = document.querySelectorAll('.leaflet-interactive')
+    // glebasIdentificadas.forEach(g => {
+    //   g.addEventListener("click", function () {
+    //     const attrProcurado = g.getAttribute('d')
+    //     let posicaoElemento = -1;
+
+    //     for(var i = 0; i<glebasIdentificadas.length; i++){
+    //       var el = glebasIdentificadas[i];
+    //       var nomeAtributo = el.getAttribute('d');
+
+    //       if(nomeAtributo === attrProcurado){
+    //         posicaoElemento = i;
+    //         break;
+    //       }
+    //     }
+    //     console.log(dataa[posicaoElemento]) // Retornando o array referente à gleba clicada
+    //   })
+    // })
     glebasIdentificadas.forEach(g => {
-      g.addEventListener("click", function () {
-        const attrProcurado = g.getAttribute('d')
-        let posicaoElemento = -1;
-
-        for(var i = 0; i<glebasIdentificadas.length; i++){
-          var el = glebasIdentificadas[i];
-          var nomeAtributo = el.getAttribute('d');
-
-          if(nomeAtributo === attrProcurado){
-            posicaoElemento = i;
-            break;
-          }
-        }
-        console.log(dataa[posicaoElemento]) // Retornando o array referente à gleba clicada
+      g.addEventListener("focus", function () {
+        document.querySelector('#grafico').style.display = 'block'
+        document.querySelector('#textoGrafico').style.display = 'none'
+      })
+      g.addEventListener("blur", function () {
+        document.querySelector('#grafico').style.display = 'none'
+        document.querySelector('#textoGrafico').style.display = 'block'
       })
     })
   }
@@ -333,7 +320,7 @@ export default function Home() {
         <nav className="h-[50px] w-full absolute z-[500] flex justify-center items-center">
           <NotificationContainer />
           <div className="flex bg-white w-max p-[10px] text-[15px] rounded-[5px]">
-            <span className="pr-[8px] border-r-[2px] cursor-default">Filtros</span>
+            {/* <span className="pr-[8px] border-r-[2px] cursor-default">Filtros</span> */}
             <ul className="flex">
               <li className="flex items-center pr-[8px] border-r-[2px]">
                 <span className="ml-[8px] mr-[6px] cursor-default">Código</span>
@@ -375,15 +362,15 @@ export default function Home() {
                 <span className="ml-[8px] mr-[6px] cursor-default">Clima</span>
                 <input onChange={generateForm} className="checkboxField cursor-pointer" type="checkbox" name="in_clima" id="ch_clima" />
               </li>
-              <li className="flex items-center">
+              <li className="flex items-center pr-[8px] border-r-[2px]">
                 <span className="ml-[8px] mr-[6px] cursor-default">Cultivo</span>
                 <input onChange={generateForm} className="checkboxField cursor-pointer" type="checkbox" name="in_ciclo_do_cultivo" id="ch_ciclo_do_cultivo" />
               </li>
-              <li className="flex items-center">
+              <li className="flex items-center pr-[8px] border-r-[2px]">
                 <span className="ml-[8px] mr-[6px] cursor-default">Identificador</span>
                 <input onChange={generateForm} className="checkboxField cursor-pointer" type="checkbox" name="in_identificador" id="ch_identificador" />
               </li>
-              <li className="flex items-center">
+              <li className="flex items-center pr-[8px] border-r-[2px]">
                 <span className="ml-[8px] mr-[6px] cursor-default">Estado</span>
                 <input onChange={generateForm} className="checkboxField cursor-pointer" type="checkbox" name="in_estado" id="ch_estado" />
               </li>
@@ -396,7 +383,7 @@ export default function Home() {
           <div className="absolute right-2 h-[42px] w-[42px] bg-white rounded-[5px] flex items-center justify-center cursor-pointer" onClick={logout}><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className="css-i6dzq1"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></div>
         </nav>
         <div className="absolute w-[300px] h-[170px] rounded-[5px] bg-white z-[900] right-2 bottom-6 flex p-[10px] justify-center items-center">
-          {/* <p className="text-center text-[#b5b5b5]">Clique em uma gleba para ver a série temporal</p> */}
+          <p id="textoGrafico" className="text-center text-[#b5b5b5]">Clique em uma gleba para ver a série temporal</p>
           <MyChart />
         </div>
         <div className="absolute bg-white w-[300px] h-max z-[404] mx-auto inset-0 top-[55px] rounded-[5px] shadow-2xl">
