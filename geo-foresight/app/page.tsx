@@ -419,9 +419,20 @@ export default function Home() {
             {/* <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Clima" type="text" name="" id="in_clima" /> */}
             <select className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" name="in_clima" id="in_clima">
               <option value="">Selecione um clima</option>
-              <option value="seco">seco</option>
-              <option value="úmido">úmido</option>
-              <option value="outro">outro</option>
+              <option value="Chuva excessiva">Chuva excessiva</option>
+              <option value="Geada">Geada</option>
+              <option value="Granizo">Granizo</option>
+              <option value="Seca">Seca</option>
+              <option value="Tromba de agua">Tromba de agua</option>
+              <option value="Vendaval">Vendaval</option>
+              <option value="Vento frio">Vento frio</option>
+              <option value="Vento forte">Vento forte</option>
+              <option value="Variacao excessiva de temperatura">Variacao excessiva de temperatura</option>
+              <option value="Raio">Raio</option>
+              <option value="Outros fenomenos naturais fortuitos">Outros fenomenos naturais fortuitos</option>
+              <option value="Doenca ou praga">Doenca ou praga</option>
+              <option value="Enchentes">Enchentes</option>
+              <option value="Chuva na colheita">Chuva na colheita</option>
             </select>
             <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Cultivo" type="text" name="" id="in_ciclo_do_cultivo" />
             <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Identificador" type="text" name="" id="in_identificador" />
