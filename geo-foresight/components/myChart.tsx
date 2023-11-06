@@ -53,13 +53,15 @@ import {
     Tooltip
   );
 
-const MyChart = () => {
+const MyChart = (props) => {
+  const numeros = props.minhaProp;
+  const datas = props.minhaLista;
   const data = {
-    labels: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio'],
+    labels: datas,
     datasets: [
       {
         label: 'Label Title',
-        data: [12, 19, 3, 5, 2, 12, 19, 3, 5, 2],
+        data: numeros,
         backgroundColor: 'rgba(75, 192, 192, 0.2)',
         borderColor: 'rgba(75, 192, 192, 1)',
         borderWidth: 1,
@@ -77,9 +79,12 @@ const MyChart = () => {
       },
     },
   };
+  
+
+  console.log(datas)
 
   return (
-    <div className='w-full hidden' id='grafico'>
+    <div className='w-full m-[10px] hidden' id='grafico'>
       <Line data={data} options={options} />
     </div>
   );
