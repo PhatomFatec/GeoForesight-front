@@ -15,6 +15,8 @@ export default function Home() {
   const [data, setData] = useState([]);
   const [centro, setCentro] = useState([-15.7217003, -48.1021702])
   const [zoom, setZoom] = useState(6)
+  const [listaaa, setListaaa] = useState(0);
+  const [dateee, setDateee] = useState(0);
 
   useEffect(() => {
     if (data.length > 0) {
@@ -275,25 +277,42 @@ export default function Home() {
 
   // leaflet-interactive
 
+  let listaa = []
+  let datee = []
+
   function glebaEventListener() {
     const glebasIdentificadas = document.querySelectorAll('.leaflet-interactive')
-    // glebasIdentificadas.forEach(g => {
-    //   g.addEventListener("click", function () {
-    //     const attrProcurado = g.getAttribute('d')
-    //     let posicaoElemento = -1;
+    glebasIdentificadas.forEach(g => {
+      g.addEventListener("click", function () {
+        listaa = []
+        datee = []
+        const attrProcurado = g.getAttribute('d')
+        let posicaoElemento = -1;
 
-    //     for(var i = 0; i<glebasIdentificadas.length; i++){
-    //       var el = glebasIdentificadas[i];
-    //       var nomeAtributo = el.getAttribute('d');
+        for (var i = 0; i < glebasIdentificadas.length; i++) {
+          var el = glebasIdentificadas[i];
+          var nomeAtributo = el.getAttribute('d');
 
-    //       if(nomeAtributo === attrProcurado){
-    //         posicaoElemento = i;
-    //         break;
-    //       }
-    //     }
-    //     console.log(dataa[posicaoElemento]) // Retornando o array referente à gleba clicada
-    //   })
-    // })
+          if (nomeAtributo === attrProcurado) {
+            posicaoElemento = i;
+            break;
+          }
+        }
+        const refbacen = dataa[posicaoElemento].ref_bacen // Retornando o array referente à gleba clicada
+
+        console.log(refbacen)
+
+        dataa.forEach(element => {
+          if (element.ref_bacen == refbacen) {
+            listaa.push(element.previsao)
+            datee.push(element.date)
+            console.log(element.date)
+          }
+        });
+        setListaaa(listaa)
+        setDateee(datee)
+      })
+    })
     glebasIdentificadas.forEach(g => {
       g.addEventListener("focus", function () {
         document.querySelector('#grafico').style.display = 'block'
@@ -382,9 +401,9 @@ export default function Home() {
           </div>
           <div className="absolute right-2 h-[42px] w-[42px] bg-white rounded-[5px] flex items-center justify-center cursor-pointer" onClick={logout}><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className="css-i6dzq1"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></div>
         </nav>
-        <div className="absolute w-[300px] h-[170px] rounded-[5px] bg-white z-[900] right-2 bottom-6 flex p-[10px] justify-center items-center">
-          <p id="textoGrafico" className="text-center text-[#b5b5b5]">Clique em uma gleba para ver a série temporal</p>
-          <MyChart />
+        <div className="absolute w-[500px] rounded-[5px] bg-white z-[900] right-2 bottom-6 flex justify-center items-center">
+          {/* <p id="textoGrafico" className="text-center text-[#b5b5b5]">Clique em uma gleba para ver a série temporal</p> */}
+          <MyChart minhaProp={listaaa} setMinhaProp={setListaaa} minhaLista={dateee} setMinhaLista={setDateee}/>
         </div>
         <div className="absolute bg-white w-[300px] h-max z-[404] mx-auto inset-0 top-[55px] rounded-[5px] shadow-2xl">
           <div className="m-[20px]">
