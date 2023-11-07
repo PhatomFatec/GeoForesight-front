@@ -60,7 +60,7 @@ const MyChart = (props) => {
     labels: datas,
     datasets: [
       {
-        label: 'Label Title',
+        label: 'Predição',
         data: numeros,
         backgroundColor: 'rgba(75, 192, 192, 0.2)',
         borderColor: 'rgba(75, 192, 192, 1)',

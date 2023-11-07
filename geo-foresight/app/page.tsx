@@ -304,9 +304,10 @@ export default function Home() {
 
         dataa.forEach(element => {
           if (element.ref_bacen == refbacen) {
-            listaa.push(element.previsao)
-            datee.push(element.date)
-            console.log(element.date)
+            if(!datee.includes(element.date)){
+              datee.push(element.date)
+              listaa.push(element.previsao)
+            }
           }
         });
         setListaaa(listaa)
