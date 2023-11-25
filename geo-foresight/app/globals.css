@@ -43,3 +43,7 @@ body {
 .emailAnimation{
   transition: 0.2s;
 }
+
+.nextjs-toast-errors-parent{
+  display: none;
+}

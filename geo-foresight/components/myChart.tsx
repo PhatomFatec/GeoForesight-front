@@ -56,14 +56,22 @@ import {
 const MyChart = (props) => {
   const numeros = props.minhaProp;
   const datas = props.minhaLista;
+  const indice = props.inlista;
   const data = {
     labels: datas,
     datasets: [
       {
-        label: 'Predição',
-        data: numeros,
+        label: 'Índice',
+        data: indice,
         backgroundColor: 'rgba(75, 192, 192, 0.2)',
         borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 1,
+      },
+      {
+        label: 'Predição',
+        data: numeros,
+        backgroundColor: 'rgb(53, 162, 235)',
+        borderColor: 'rgba(53, 162, 235, 0.5)',
         borderWidth: 1,
       },
     ],
