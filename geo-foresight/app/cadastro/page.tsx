@@ -7,6 +7,7 @@ import { NotificationContainer, NotificationManager } from 'react-notifications'
 let checkEmail = false
 
 let termo0
+let termoId
 
 var requestOptions = {
     method: 'GET',
@@ -16,7 +17,9 @@ fetch("http://127.0.0.1:5000/termo_mais_recente", requestOptions)
     .then(response => response.text())
     .then(result => {
         result = JSON.parse(result)
-        termo0 = result.termo
+        console.log(result)
+        termo0 = result[1].termo
+        termoId = result[1].id
     })
     .catch(error => { console.log('error', error) });
 
@@ -85,7 +88,7 @@ const Cadastro = () => {
         const email = document.querySelector('#email').value
         const pass = document.querySelector('#password').value
         const nome = document.querySelector('#nome').value
-        const receberEmail = document.querySelector('#emailsms').checked
+        // const receberEmail = document.querySelector('#emailsms').checked
 
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
@@ -94,8 +97,9 @@ const Cadastro = () => {
             "nome": nome,
             "email": email,
             "senha": pass,
-            "aceitacao_padrao": true,
-            "aceitacao_email": receberEmail
+            "aceites": [
+                {"id_termo": termoId, "aceite": true}
+              ]
         });
 
         var requestOptions = {
@@ -207,10 +211,10 @@ const Cadastro = () => {
                         <input className='mr-[10px]' type="checkbox" onChange={allFieldsFilled} name='terms' id="terms" />
                         <label htmlFor="terms">Concordo e aceito os <span onClick={mostraTermos} className='hover:text-cyan-600 font-bold cursor-pointer'>Termos e condições</span></label>
                     </div>
-                    <div className='flex'>
+                    {/* <div className='flex'>
                         <input className='mr-[10px]' type="checkbox" name='emailsms' id="emailsms" />
                         <label htmlFor="terms">Quero receber e-mails informativos</label>
-                    </div>
+                    </div> */}
                     <div className='text-[14px] text-[#e1e1e1]'>
                         <p id='maiuscula'>Contém ao menos uma letra maiúscula</p>
                         <p id='numero'>Contém ao menos um número</p>

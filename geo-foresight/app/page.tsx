@@ -15,6 +15,9 @@ export default function Home() {
   const [data, setData] = useState([]);
   const [centro, setCentro] = useState([-15.7217003, -48.1021702])
   const [zoom, setZoom] = useState(6)
+  const [listaaa, setListaaa] = useState(0);
+  const [dateee, setDateee] = useState(0);
+  const [listaindice, setListaindice] = useState(0);
 
   useEffect(() => {
     if (data.length > 0) {
@@ -73,7 +76,6 @@ export default function Home() {
       "municipio": fields.municipio,
       "produto": null
     });
-    console.log(JSON.parse(raw))
 
     var requestOptions = {
       method: 'POST',
@@ -99,6 +101,8 @@ export default function Home() {
     document.querySelector('.loading').style.display = 'none'
 
     const jsonResult = JSON.parse(r)
+
+    console.log(jsonResult)
 
     jsonResult.forEach(gleba => {
       let coordenadasLista = []
@@ -193,9 +197,9 @@ export default function Home() {
 
       const raw = JSON.stringify({
         "id_user": localStorage.getItem('user_id'),
-        "id_termo": localStorage.getItem('id_termo'),
-        "aceitacao_padrao": true,
-        "aceitacao_email": false
+        "aceites": [
+          {"id_termo": 1, "aceite": false}
+        ]
       })
 
       var requestOptions = {
@@ -227,9 +231,9 @@ export default function Home() {
 
       const raw = JSON.stringify({
         "id_user": localStorage.getItem('user_id'),
-        "id_termo": localStorage.getItem('id_termo'),
-        "aceitacao_padrao": true,
-        "aceitacao_email": true
+        "aceites": [
+          {"id_termo": 1, "aceite": true}
+        ]
       })
 
       var requestOptions = {
@@ -275,25 +279,45 @@ export default function Home() {
 
   // leaflet-interactive
 
+  let listaa = []
+  let datee = []
+  let lixo = []
+
   function glebaEventListener() {
     const glebasIdentificadas = document.querySelectorAll('.leaflet-interactive')
-    // glebasIdentificadas.forEach(g => {
-    //   g.addEventListener("click", function () {
-    //     const attrProcurado = g.getAttribute('d')
-    //     let posicaoElemento = -1;
+    glebasIdentificadas.forEach(g => {
+      g.addEventListener("click", function () {
+        listaa = []
+        datee = []
+        lixo = []
+        const attrProcurado = g.getAttribute('d')
+        let posicaoElemento = -1;
 
-    //     for(var i = 0; i<glebasIdentificadas.length; i++){
-    //       var el = glebasIdentificadas[i];
-    //       var nomeAtributo = el.getAttribute('d');
+        for (var i = 0; i < glebasIdentificadas.length; i++) {
+          var el = glebasIdentificadas[i];
+          var nomeAtributo = el.getAttribute('d');
 
-    //       if(nomeAtributo === attrProcurado){
-    //         posicaoElemento = i;
-    //         break;
-    //       }
-    //     }
-    //     console.log(dataa[posicaoElemento]) // Retornando o array referente à gleba clicada
-    //   })
-    // })
+          if (nomeAtributo === attrProcurado) {
+            posicaoElemento = i;
+            break;
+          }
+        }
+        const refbacen = dataa[posicaoElemento].ref_bacen // Retornando o array referente à gleba clicada
+
+        dataa.forEach(element => {
+          if (element.ref_bacen == refbacen) {
+            if (!datee.includes(element.date)) {
+              datee.push(element.date)
+              listaa.push(element.previsao)
+              lixo.push(element.indice)
+            }
+          }
+        });
+        setListaaa(listaa)
+        setDateee(datee)
+        setListaindice(lixo)
+      })
+    })
     glebasIdentificadas.forEach(g => {
       g.addEventListener("focus", function () {
         document.querySelector('#grafico').style.display = 'block'
@@ -310,13 +334,16 @@ export default function Home() {
 
     return (
       <div className="relative">
-        <div onClick={emailNotification} className="fixed z-[1000] bg-white w-[50px] h-[50px] bottom-3 left-3 rounded-[25px] flex items-center shadow-lg flex-row overflow-hidden hover:w-[246px] emailAnimation cursor-pointer">
+        <div onClick={emailNotification} className="fixed z-[1000] bg-white w-[50px] h-[50px] bottom-5 left-5 rounded-[25px] flex items-center shadow-lg flex-row overflow-hidden hover:w-[246px] emailAnimation cursor-pointer">
           <div className="svg min-w-[50px] h-[50px] flex justify-center items-center ">
             <svg id="notOn" className="hidden" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
             <svg id="notOff" className="text-[red] hidden" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M13.73 21a2 2 0 0 1-3.46 0"></path><path d="M18.63 13A17.89 17.89 0 0 1 18 8"></path><path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"></path><path d="M18 8a6 6 0 0 0-9.33-5"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
           </div>
           <p className="min-w-max">Notificações por e-mail</p>
         </div>
+        <a href="/perfil" className="fixed z-[1000] bg-white w-[50px] h-[50px] bottom-5 right-5 rounded-full flex justify-center items-center">
+          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </a>
         <nav className="h-[50px] w-full absolute z-[500] flex justify-center items-center">
           <NotificationContainer />
           <div className="flex bg-white w-max p-[10px] text-[15px] rounded-[5px]">
@@ -382,9 +409,9 @@ export default function Home() {
           </div>
           <div className="absolute right-2 h-[42px] w-[42px] bg-white rounded-[5px] flex items-center justify-center cursor-pointer" onClick={logout}><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className="css-i6dzq1"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></div>
         </nav>
-        <div className="absolute w-[300px] h-[170px] rounded-[5px] bg-white z-[900] right-2 bottom-6 flex p-[10px] justify-center items-center">
-          <p id="textoGrafico" className="text-center text-[#b5b5b5]">Clique em uma gleba para ver a série temporal</p>
-          <MyChart />
+        <div className="absolute w-[500px] rounded-[5px] bg-white z-[900] right-2 bottom-6 flex justify-center items-center">
+          {/* <p id="textoGrafico" className="text-center text-[#b5b5b5]">Clique em uma gleba para ver a série temporal</p> */}
+          <MyChart minhaProp={listaaa} setMinhaProp={setListaaa} minhaLista={dateee} setMinhaLista={setDateee} inlista={listaindice} setInlista={setListaindice} />
         </div>
         <div className="absolute bg-white w-[300px] h-max z-[404] mx-auto inset-0 top-[55px] rounded-[5px] shadow-2xl">
           <div className="m-[20px]">
@@ -395,14 +422,38 @@ export default function Home() {
             <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Final da colheita" type="text" name="" id="in_final_da_colheita" />
             <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Grão" type="text" name="" id="in_grao" />
             <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Produção" type="text" name="" id="in_producao" />
-            <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Irrigação" type="text" name="" id="in_irrigacao" />
+            {/* <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Irrigação" type="text" name="" id="in_irrigacao" /> */}
+            <select className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" name="" id="in_irrigacao">
+              <option value="Não Irrigado">Não Irrigado</option>
+              <option value="Gotejamento">Gotejamento</option>
+              <option value="Micro-aspersão">Micro-aspersão</option>
+              <option value="Aspersão">Aspersão</option>
+              <option value="Xique-Xique">Xique-Xique</option>
+              <option value="Pivô">Pivô</option>
+              <option value="Canhão">Canhão</option>
+              <option value="Auto-Propelido">Auto-Propelido</option>
+              <option value="Sulcos">Sulcos</option>
+              <option value="Inundação">Inundação</option>
+              <option value="Não se aplica">Não se aplica</option>
+            </select>
             <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Solo" type="text" name="" id="in_solo" />
             {/* <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Clima" type="text" name="" id="in_clima" /> */}
             <select className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" name="in_clima" id="in_clima">
               <option value="">Selecione um clima</option>
-              <option value="seco">seco</option>
-              <option value="úmido">úmido</option>
-              <option value="outro">outro</option>
+              <option value="Chuva excessiva">Chuva excessiva</option>
+              <option value="Geada">Geada</option>
+              <option value="Granizo">Granizo</option>
+              <option value="Seca">Seca</option>
+              <option value="Tromba de agua">Tromba de agua</option>
+              <option value="Vendaval">Vendaval</option>
+              <option value="Vento frio">Vento frio</option>
+              <option value="Vento forte">Vento forte</option>
+              <option value="Variacao excessiva de temperatura">Variacao excessiva de temperatura</option>
+              <option value="Raio">Raio</option>
+              <option value="Outros fenomenos naturais fortuitos">Outros fenomenos naturais fortuitos</option>
+              <option value="Doenca ou praga">Doenca ou praga</option>
+              <option value="Enchentes">Enchentes</option>
+              <option value="Chuva na colheita">Chuva na colheita</option>
             </select>
             <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Cultivo" type="text" name="" id="in_ciclo_do_cultivo" />
             <input className="hidden w-full focus:outline-none border-b-[2px] focus:border-[#11145e] mb-[8px]" placeholder="Identificador" type="text" name="" id="in_identificador" />

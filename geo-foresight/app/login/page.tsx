@@ -33,11 +33,14 @@ const Login = () => {
         if(typeof(JSON.parse(result).access_token) != undefined){
           localStorage.setItem('email', email)
           signIn(result)
-          return
+          // return
         }
-        if(typeof(JSON.parse(result).message) != undefined){
+        if (JSON.parse(result).message == "Credenciais inválidas."){
           NotificationManager.error(JSON.parse(result).message)
         }
+        console.log('aaaaa')
+        console.log(JSON.parse(result).message)
+        console.log('aaaaa')
       })
       .catch(error => {
         console.log(error)
@@ -60,12 +63,12 @@ const Login = () => {
       .then(response => response.text())
       .then(result => {
         result = JSON.parse(result)
-        if(result.message == "Último termo já aceito"){
-          window.location.href = '/'
-        }
-        else{
-          window.location.href = '/termos'
-        }
+        result.termos_aceitos.forEach(termo => {
+          if(termo.aceite == false){
+            location.href = '/termos'
+          }
+        });
+        location.href = '/'
       })
       .catch(error => console.log(error))
 
